@@ -153,17 +153,20 @@ int main(int argc, char** argv) {
         attempts++;
 
         if (guess > random_value) {
-            std::cout << "less than " << guess << "\n";
+            std::cout << "less than " << guess << std::endl;
         } else if (guess < random_value) {
-            std::cout << "greater than " << guess << "\n";
+            std::cout << "greater than " << guess << std::endl;
         } else {
-            std::cout << "you win! attempts = " << attempts << "\n";
+            std::cout << "you win! attempts = " << attempts << std::endl;
             break;
         }
     }
 
     if (attempts < record || record == 0) {
-        std::cout << user_name << ", congragulations! You have new record - " << attempts << "\n";
-        writeNewRecord(file_name, user_name, attempts);
+        std::cout << user_name << ", congragulations! You have new record - " << attempts << std::endl;
+
+        return writeNewRecord(file_name, user_name, attempts);
     }
+
+    return 0;
 }
