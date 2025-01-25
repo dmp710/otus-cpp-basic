@@ -7,22 +7,23 @@
 
 int readTable(const std::string& file_name) {
     std::ifstream file(file_name);
+    if (!file.is_open()) {
+			std::cout << "Failed to open file for read: " << file_name << "!" << std::endl;
+			return -1;
+	}
 
     if (file.is_open()) {
         std::string line;
 
         while (std::getline(file, line)) {
             std::istringstream iss(line);
-            std::cout << line << "\n";
+            std::cout << line << std::endl;
         }
 
         file.close();
-    } else {
-        std::cout << "Internal error" << std::endl;
-		return -1;
     }
 
-    return -1;
+    return 0;
 }
 
 
@@ -87,28 +88,30 @@ int main(int argc, char** argv) {
         for (int i = 1; i < argc; i += 2) {
             std::string arg = argv[i];
             if (arg == "-max") {
-                if (!((i + 1) < argc)) {
+                if (!(i + 1 < argc)) {
                     std::cout << "Wrong usage! The argument '-parameter' requires some value!" << std::endl;
 				    return -1;
                 }
                 max = true;
                 max_value = std::stoi(argv[i+1]);
             } else if (arg == "-table") {
-                readTable(file_name);
-                return 0;
+                return readTable(file_name);
             } else if (arg == "-level") {
-                if (!((i + 1) < argc)) {
+                if (!(i + 1 < argc)) {
                     std::cout << "Wrong usage! The argument '-parameter' requires some value!" << std::endl;
 				    return -1;
                 }
 
                 level = std::stoi(argv[i+1]);
+            } else {
+                std::cout << "Wrong flag!" << std::endl;
+		        return -1;
             }            
         }
     } 
 
     if (max && level != 0)  {
-        std::cout << "Wrong flags!" << std::endl;
+        std::cout << "Can't use max and level concurrently!" << std::endl;
 		return -1;
     }
 
