@@ -1,3 +1,0 @@
-/home/dmitrii/otus-cpp-basic/homework_4/build/CMakeFiles/physics.dir
-/home/dmitrii/otus-cpp-basic/homework_4/build/CMakeFiles/edit_cache.dir
-/home/dmitrii/otus-cpp-basic/homework_4/build/CMakeFiles/rebuild_cache.dir
