@@ -112,58 +112,43 @@ private:
 };
 
 // Класс для вычисления 90-го процентиля
-class Pct90 : public IStatistics {
-public:
-    Pct90() {}
-
-    void update(double next) override {
-        m_data.push_back(next);
-    }
-
-    double eval() const override {
-        if (m_data.empty()) return 0.0;
-
-        std::vector<double> sorted_data = m_data;
-        std::sort(sorted_data.begin(), sorted_data.end());
-
-        size_t idx = static_cast<size_t>(0.9 * sorted_data.size());
-        return sorted_data[idx];
-    }
-
-    const char * name() const override {
-        return "pct90";
-    }
-
-private:
-    std::vector<double> m_data;
-};
-
-// Класс для вычисления 95-го процентиля
-class Pct95 : public IStatistics {
-public:
-    Pct95() {}
-
-    void update(double next) override {
-        m_data.push_back(next);
-    }
-
-    double eval() const override {
-        if (m_data.empty()) return 0.0;
-
-        std::vector<double> sorted_data = m_data;
-        std::sort(sorted_data.begin(), sorted_data.end());
-
-        size_t idx = static_cast<size_t>(0.95 * sorted_data.size());
-        return sorted_data[idx];
-    }
-
-    const char * name() const override {
-        return "pct95";
-    }
-
-private:
-    std::vector<double> m_data;
-};
+class Pct : public IStatistics {
+    public:
+        Pct(double pct) : pct(pct) {
+            // Конкатенируем строку через std::to_string
+            name_str = "pct" + std::to_string(static_cast<int>(pct));
+        }
+    
+        void update(double next) override {
+            m_data.push_back(next);
+        }
+    
+        double eval() const override {
+            if (m_data.empty()) return 0.0;
+    
+            std::vector<double> sorted_data = m_data;
+            std::sort(sorted_data.begin(), sorted_data.end());
+    
+            // Рассчитываем индекс с учетом округления
+            size_t idx = static_cast<size_t>(std::round(pct / 100.0 * (sorted_data.size() - 1)));
+            if (idx >= sorted_data.size()) {
+                idx = sorted_data.size() - 1; // В случае выхода за пределы
+            }
+    
+            return sorted_data[idx];
+        }
+    
+        const char* name() const override {
+            return name_str.c_str();
+        }
+    
+    private:
+        double pct;
+        std::string name_str;  // Используем std::string для имени
+        std::vector<double> m_data;
+    };
+    
+    
 
 int main() {
     const size_t statistics_count = 6;
@@ -174,8 +159,8 @@ int main() {
     statistics[1] = new Max{};
     statistics[2] = new Mean{};
     statistics[3] = new Std{};
-    statistics[4] = new Pct90{};
-    statistics[5] = new Pct95{};
+    statistics[4] = new Pct{90};
+    statistics[5] = new Pct{95};
 
     double val = 0;
     while (std::cin >> val) {
@@ -185,7 +170,7 @@ int main() {
     }
 
     // Проверка на ошибки ввода
-    if (!std::cin.eof() && !std::cin.good()) {
+    if (!std::cin.eof() && std::cin.fail()) {
         std::cerr << "Invalid input data\n";
         return 1;
     }
