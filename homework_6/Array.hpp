@@ -1,8 +1,5 @@
 #pragma once
 
-#ifndef ARRAY_HPP
-#define ARRAY_HPP
-
 #include <cstddef>
 #include <iostream>
 
@@ -110,5 +107,3 @@ public:
         std::cout << std::endl;
     }
 };
-
-#endif // ARRAY_HPP
