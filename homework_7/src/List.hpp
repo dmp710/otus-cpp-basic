@@ -92,8 +92,38 @@ public:
     
         return temp->data;
     }
-    
+
     size_t size() const { return length; }
+
+    List(const List& other) : head(nullptr), length(0) {
+        Node<T>* temp = other.head;
+        
+        while (temp) {
+            push_back(temp->data);  // Создаем новые узлы в новом списке
+            temp = temp->next;
+        }
+    }
+
+    List& operator=(const List& other) {
+        if (this != &other) {  // Проверяем на самоприсваивание
+            // Очистка текущего списка
+            while (head) {
+                temp = head;
+                head = head->next;
+                delete temp;
+            }
+    
+            // Копирование элементов из другого списка
+            Node<T>* temp = other.head;
+            while (temp) {
+                push_back(temp->data);  // Копируем элементы в новый список
+                temp = temp->next;
+            }
+    
+            length = other.length;
+        }
+        return *this;
+    }
 
     void print() {
         temp = head;

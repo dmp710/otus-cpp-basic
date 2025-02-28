@@ -95,7 +95,7 @@ TEST(ListTest, CopyConstructor) {
     original.push_back(2);
     original.push_back(3);
 
-    List<int> copy = original; // Используем конструктор копирования
+    List<int> copy{original}; // Используем конструктор копирования
 
     // Проверяем, что размеры одинаковые
     ASSERT_EQ(original.size(), copy.size());
