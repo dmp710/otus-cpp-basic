@@ -85,4 +85,24 @@ public:
 
         std::cout << std::endl;
     }
+
+    // Конструктор копирования
+    Array(const Array& other) : arr(new T[other.capacity]), capacity(other.capacity), current_size(other.current_size) {
+        for (size_t i = 0; i < current_size; ++i) arr[i] = other.arr[i];
+    }
+
+    // Оператор присваивания копированием
+    Array& operator=(const Array& other) {
+        if (this != &other) {
+            delete[] arr; // Освобождаем память
+    
+            current_size = other.current_size;
+            arr = new T[other.capacity];
+
+            for (size_t i = 0; i < current_size; ++i) arr[i] = other.arr[i];
+
+        }
+
+        return *this;
+    }
 };

@@ -32,30 +32,30 @@ target_include_directories(containers PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src")
 
 # Test target
 add_executable(
-    test_list
+    containers_tests
     test/test_list.cpp
     test/test_array.cpp
 )
 
 # Подключаем GTest к test_list
 target_link_libraries(
-    test_list PRIVATE
+    containers_tests PRIVATE
     gtest_main
 )
 
 # Добавляем include-пути для gtest
 target_include_directories(
-    test_list PRIVATE
+    containers_tests PRIVATE
     "${CMAKE_CURRENT_SOURCE_DIR}/src"
     ${GTest_INCLUDE_DIRS}
 )
 
 # Включаем Google Test
 enable_testing()
-add_test(NAME test_list COMMAND test_list)
+add_test(NAME containers_tests COMMAND tests)
 
 set_target_properties(containers PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED ON)
-set_target_properties(test_list PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED ON)
+set_target_properties(containers_tests PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED ON)
 
 if (MSVC)
     target_compile_options(
@@ -63,7 +63,7 @@ if (MSVC)
         /W4
     )
     target_compile_options(
-        test_list PRIVATE
+        containers_tests PRIVATE
         /W4
     )
 else ()
@@ -72,7 +72,7 @@ else ()
         -Wall -Wextra -pedantic -Werror
     )
     target_compile_options(
-        test_list PRIVATE
+        containers_tests PRIVATE
         -Wall -Wextra -pedantic -Werror
     )
 endif()

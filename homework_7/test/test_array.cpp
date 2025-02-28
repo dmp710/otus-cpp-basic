@@ -99,7 +99,7 @@ void test_copy_constructor() {
     arr1.push_back(30);
 
     // Используем конструктор копирования
-    Array<int> arr2 = arr1;
+    Array<int> arr2{arr1};
 
     // Проверяем, что содержимое обоих контейнеров одинаково
     assert(arr1.size() == arr2.size());
