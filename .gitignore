@@ -3,3 +3,4 @@ a.out
 m_test.cpp
 *build*
 .vscode
+CMakeFiles
