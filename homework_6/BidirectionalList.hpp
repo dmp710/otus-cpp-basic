@@ -85,6 +85,8 @@ public:
         if (temp == head) head = temp->next;
         if (temp == tail) tail = temp->prev;
 
+        delete temp;
+
         length--;
     }
 

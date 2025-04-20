@@ -47,6 +47,7 @@ int readHighScores(const std::string& file_name, const std::string& user_name) {
 
             std::cout << name << std::endl;
             std::cout << attempts << std::endl;
+            
             if (name == user_name) {
                 count = std::stoi(attempts);
             }
