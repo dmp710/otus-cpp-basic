@@ -36,11 +36,11 @@ int main(int argc, char* argv[]) {
     // original_data.resize(size);
     // file.read(reinterpret_cast<char*>(original_data.data()), size);
 
+    auto t = benchmark_threads(original_data); 
+
+    auto original_crc = calculate_crc32(original_data);
+
     original_data.insert(original_data.end(), APPEND_TEXT.begin(), APPEND_TEXT.end());
-
-    uint32_t original_crc = calculate_crc32(original_data);
-
-    unsigned int t = benchmark_threads(original_data); 
 
     // number of possible combinations for 4 byte  
     uint64_t total = uint64_t(1) << 32;
@@ -53,7 +53,7 @@ int main(int argc, char* argv[]) {
         auto start = i * chunk;
         auto end = (i == t - 1) ? total : (start + chunk);
 
-        threads.emplace_back(worker, std::cref(original_data), 
+        threads.emplace_back(worker, original_data, 
                     original_crc, start, end, &results[i]);
     }
 

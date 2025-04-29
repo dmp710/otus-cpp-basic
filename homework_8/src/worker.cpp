@@ -10,12 +10,12 @@ uint32_t calculate_crc32(const std::vector<uint8_t>& data) {
     return crc32(0, data.data(), data.size());
 }
 
-void worker(const std::vector<uint8_t>& base, uint32_t target_crc,
+void worker(std::vector<uint8_t> base, 
+            uint32_t target_crc,
             uint32_t start, uint32_t end,
             std::vector<uint8_t>* result_ptr) {
     // calculate prefix for optimization
-    auto prefix = base;
-    uint32_t prefix_crc = crc32(0, prefix.data(), prefix.size());
+    uint32_t prefix_crc = crc32(0, base.data(), base.size());
 
     // calculate suffix
     std::vector<uint8_t> suffix(4); // 4 байта под подбор
@@ -32,8 +32,8 @@ void worker(const std::vector<uint8_t>& base, uint32_t target_crc,
             found.store(true);
 
             if (result_ptr) {
-                prefix.insert(prefix.end(), suffix.begin(), suffix.end());
-                *result_ptr = std::move(prefix);
+                base.insert(base.end(), suffix.begin(), suffix.end());
+                *result_ptr = std::move(base);
             }
 
             return;
