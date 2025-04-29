@@ -36,9 +36,9 @@ int main(int argc, char* argv[]) {
     // original_data.resize(size);
     // file.read(reinterpret_cast<char*>(original_data.data()), size);
 
-    uint32_t original_crc = calculate_crc32(original_data);
-
     original_data.insert(original_data.end(), APPEND_TEXT.begin(), APPEND_TEXT.end());
+
+    uint32_t original_crc = calculate_crc32(original_data);
 
     unsigned int t = benchmark_threads(original_data); 
 

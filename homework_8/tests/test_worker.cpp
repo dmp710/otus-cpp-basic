@@ -5,11 +5,9 @@
 #include <atomic>
 #include "../src/worker.hpp"
 
-extern std::atomic<bool> found;
+// extern std::atomic<bool> found;
 
 TEST(WorkerTest, FindsCorrectSuffix) {
-    found = false;
-
     // Базовые данные
     std::vector<uint8_t> base = {'T', 'E', 'S', 'T'};
     std::string append = "He-he-he";
