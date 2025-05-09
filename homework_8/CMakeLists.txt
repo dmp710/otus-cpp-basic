@@ -5,6 +5,17 @@ project(08.homework)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+# Добавляем предупреждения
+if (CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+    add_compile_options(
+        -Wall
+        -Wextra
+        -Wconversion
+        -Wsign-conversion
+        -Wpedantic
+    )
+endif()
+
 include_directories(${CMAKE_SOURCE_DIR})  # Добавляем путь к заголовочным файлам
 
 include(FetchContent)
@@ -49,13 +60,13 @@ add_executable(worker_test
     tests/test_worker.cpp
     src/worker.cpp
 )
-
+# куда линкуемся
 target_link_libraries(worker_test
     PRIVATE
     gtest_main
     zlibstatic
 )
-
+# заголовочные файлы
 target_include_directories(worker_test PRIVATE
     ${zlib_SOURCE_DIR}
     ${zlib_BINARY_DIR}

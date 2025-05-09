@@ -3,13 +3,18 @@
 #include <vector>
 #include <thread>
 #include <atomic>
-#include <zlib.h>
 #include <cstdint>
+#include <zlib.h>
 
 #include "threads_benchmark.hpp"
 #include "worker.hpp"
 
 const std::string APPEND_TEXT = "He-he-he";
+
+uint32_t calculate_crc32(const std::vector<uint8_t> &data)
+{
+    return crc32(0, data.data(), data.size());
+}
 
 int main(int argc, char* argv[]) {
     if (argc < 3) {
@@ -29,39 +34,34 @@ int main(int argc, char* argv[]) {
     std::vector<uint8_t> original_data((std::istreambuf_iterator<char>(file)),
                                         std::istreambuf_iterator<char>());
 
-    // std::vector<uint8_t> original_data;
-    // file.seekg(0, std::ios::end);
-    // std::streamsize size = file.tellg();
-    // file.seekg(0, std::ios::beg);
-    // original_data.resize(size);
-    // file.read(reinterpret_cast<char*>(original_data.data()), size);
-
-    auto t = benchmark_threads(original_data); 
-
+    // Вычисляем CRC32 от оригинальных данных (до добавления текста)
     auto original_crc = calculate_crc32(original_data);
 
-    original_data.insert(original_data.end(), APPEND_TEXT.begin(), APPEND_TEXT.end());
+    // Готовим данные, к которым будем добавлять 4 байта — это оригинал + APPEND_TEXT
+    std::vector<uint8_t> base = original_data;
+    base.insert(base.end(), APPEND_TEXT.begin(), APPEND_TEXT.end());
 
-    // number of possible combinations for 4 byte  
+    // Количество потоков
+    auto t = benchmark_threads(base);
+
+    // Подготовка диапазонов
     uint64_t total = uint64_t(1) << 32;
     uint64_t chunk = total / t;
 
     std::vector<std::thread> threads;
-    std::vector<std::vector<uint8_t>> results(t);  // каждый поток пишет в свой result
+    std::vector<std::vector<uint8_t>> results(t);  // Каждый поток записывает сюда
 
     for (unsigned int i = 0; i < t; ++i) {
         auto start = i * chunk;
         auto end = (i == t - 1) ? total : (start + chunk);
 
-        threads.emplace_back(worker, original_data, 
-                    original_crc, start, end, &results[i]);
+        threads.emplace_back(worker, base, original_crc, start, end, &results[i]);
     }
 
     for (auto& t : threads) {
         t.join();
     }
 
-    // Поиск успешного результата
     for (const auto& result : results) {
         if (!result.empty()) {
             std::ofstream out(output_path, std::ios::binary);

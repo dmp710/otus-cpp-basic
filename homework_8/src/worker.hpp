@@ -4,10 +4,8 @@
 #include <cstdint>
 #include <atomic>
 
-uint32_t calculate_crc32(const std::vector<uint8_t>& data);
-
 void worker(std::vector<uint8_t> base, uint32_t target_crc,
-            uint32_t start, uint32_t end,
+            uint64_t start, uint64_t end,
             std::vector<uint8_t>* result_ptr);
 
 extern std::atomic<bool> found;
