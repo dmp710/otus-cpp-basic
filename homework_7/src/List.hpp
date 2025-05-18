@@ -14,9 +14,9 @@ private:
     Node<T>* head;
     size_t length;
 
-    Node<T>* temp;
-
     virtual void clear() {
+        Node<T>* temp;
+
         while (head) {
             temp = head;
             head = head->next;
@@ -25,10 +25,36 @@ private:
     }
     
 public:
-    List() : head(nullptr), length(0), temp(nullptr) {}
+    List() : head(nullptr), length(0) {}
 
     ~List() {
-        clear()
+        clear();
+    }
+
+    List(const List& other) : head(nullptr), length(0) {
+        Node<T>* temp = other.head;
+
+        while (temp) {
+            push_back(temp->data);  
+            temp = temp->next;
+        }
+    }
+
+    List& operator=(const List& other) {
+        if (this != &other) {  
+            clear();
+    
+            auto temp = other.head;
+            // Копирование элементов из другого списка
+            while (temp) {
+                push_back(temp->data); 
+                temp = temp->next;
+            }
+    
+            length = other.length;
+        }
+
+        return *this;
     }
 
     void push_back(T value) {
@@ -37,7 +63,8 @@ public:
         if (!head) {
             head = newNode;
         } else {
-            temp = head;
+            auto temp = head;
+
             while (temp->next) temp = temp->next;
             temp->next = newNode;
         }
@@ -48,11 +75,13 @@ public:
     void insert(size_t pos, T value) {
         if (pos > length) return;
 
-        Node<T>* newNode = new Node<T>(value);
+        auto newNode = new Node<T>(value);
+
         if (pos == 0) {
             newNode->next = head;
             head = newNode;
         } else {
+            Node<T>* temp;
             temp = head;
 
             for (size_t i = 0; i < pos - 1; ++i) temp = temp->next;
@@ -67,7 +96,7 @@ public:
     void erase(size_t pos) {
         if (pos >= length || !head) return;
 
-        temp = head;
+        auto temp = head;
 
         if (pos == 0) {
             head = head->next;
@@ -90,7 +119,7 @@ public:
             throw std::out_of_range("Index out of range");
         }
     
-        temp = head;
+        auto temp = head;
         for (size_t i = 0; i < pos; ++i) {
             temp = temp->next;
         }
@@ -100,37 +129,8 @@ public:
 
     size_t size() const { return length; }
 
-    List(const List& other) : head(nullptr), length(0) {
-        temp = other.head;
-
-        while (temp) {
-            push_back(temp->data);  
-            temp = temp->next;
-        }
-    }
-
-    List& operator=(const List& other) {
-        if (this != &other) {  
-            while (head) {
-                temp = head;
-                head = head->next;
-                delete temp;
-            }
-    
-            // Копирование элементов из другого списка
-            temp = other.head;
-            while (temp) {
-                push_back(temp->data); 
-                temp = temp->next;
-            }
-    
-            length = other.length;
-        }
-        return *this;
-    }
-
     void print() {
-        temp = head;
+        auto temp = head;
 
         while (temp) {
             std::cout << temp->data << " ";

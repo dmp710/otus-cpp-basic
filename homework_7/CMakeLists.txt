@@ -52,10 +52,20 @@ target_include_directories(
 
 # Включаем Google Test
 enable_testing()
-add_test(NAME containers_tests COMMAND tests)
+add_test(NAME containers_tests COMMAND containers_tests)
 
 set_target_properties(containers PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED ON)
 set_target_properties(containers_tests PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED ON)
+
+if (CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+    add_compile_options(
+        -Wall
+        -Wextra
+        -Wconversion
+        -Wsign-conversion
+        -Wpedantic
+    )
+endif()
 
 if (MSVC)
     target_compile_options(
