@@ -4,3 +4,7 @@ m_test.cpp
 *build*
 .vscode
 CMakeFiles
+m_test*
+beast_server
+algoritms
+.vscode
