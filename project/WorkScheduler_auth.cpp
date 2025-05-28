@@ -1,9 +1,7 @@
-#include "WorkScheduler.h"
 #include <iostream>
 
-#include <openssl/sha.h>
-#include <sstream>
-#include <iomanip>
+#include "WorkScheduler.h"
+#include "utils.h"
 
 WorkScheduler::WorkScheduler(const std::string &connectionString)
 {
@@ -15,17 +13,6 @@ WorkScheduler::WorkScheduler(const std::string &connectionString)
 }
 
 WorkScheduler::~WorkScheduler() {}
-
-std::string hashPassword(const std::string& password) {
-    unsigned char hash[SHA256_DIGEST_LENGTH];
-    SHA256(reinterpret_cast<const unsigned char*>(password.c_str()), password.size(), hash);
-
-    std::ostringstream ss;
-    for (unsigned char c : hash) {
-        ss << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(c);
-    }
-    return ss.str();
-}
 
 bool WorkScheduler::createUser(const std::string& email, const std::string& password) {
     if (!conn_ || !conn_->is_open()) {

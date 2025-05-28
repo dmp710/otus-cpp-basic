@@ -36,6 +36,10 @@ add_executable(08.homework
     src/worker.hpp
 )
 
+target_compile_options(08.homework PRIVATE
+    -fsanitize=address
+)
+
 # куда линкуемся
 target_link_libraries(08.homework PRIVATE zlibstatic)
 # заголовочные файлы

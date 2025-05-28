@@ -25,6 +25,7 @@ private:
     std::unique_ptr<pqxx::connection> conn_;
 
     int user_id = -1;
+    bool remind;
 
     void schedule();
 
@@ -36,4 +37,6 @@ private:
         const std::string &time_end);
     
     void print_tasks_for_date(const std::string &date);
+
+    void reminder_loop();
 };

@@ -1,11 +1,23 @@
 #include <iostream>
 #include <pqxx/pqxx>
+#include <thread>
+#include <chrono>
 
 #include "WorkScheduler.h"
 #include "utils.h"
 
 void WorkScheduler::schedule()
 {
+    remind = true;
+    std::thread t([&](){
+        while(remind) {
+            reminder_loop();
+            std::this_thread::sleep_for(std::chrono::minutes(1));
+        }
+    });
+
+    t.detach();
+
     while (true)
     {
         std::cout << "\n=== Меню расписания ===" << std::endl;
@@ -205,6 +217,56 @@ void WorkScheduler::print_tasks_for_date(const std::string &date)
                       << std::setw(25) << task.time_end
                       << task.description << "\n";
         }
+    }
+}
+
+void WorkScheduler::reminder_loop() {
+    while (true) {
+        try {
+            pqxx::work txn(*conn_);
+
+            auto now = std::chrono::system_clock::now();
+            auto in_61_min = now + std::chrono::minutes(61);  // запас на 1 час вперёд
+
+            std::time_t now_time = std::chrono::system_clock::to_time_t(now);
+            std::time_t in_61_time = std::chrono::system_clock::to_time_t(in_61_min);
+
+            char now_buf[20], in_61_buf[20];
+            std::strftime(now_buf, sizeof(now_buf), "%F %T", std::localtime(&now_time));
+            std::strftime(in_61_buf, sizeof(in_61_buf), "%F %T", std::localtime(&in_61_time));
+
+            pqxx::result result = txn.exec(
+                pqxx::zview{
+                    "SELECT task_name, time_start FROM actions "
+                    "WHERE user_id = $1 AND time_start >= $2 AND time_start <= $3 "
+                    "ORDER BY time_start"
+                },
+                pqxx::params{user_id, now_buf, in_61_buf}
+            );
+
+            for (const auto &row : result) {
+                std::string name = row["task_name"].c_str();
+                std::string start_str = row["time_start"].c_str();
+
+                // преобразование с учётом часовых поясов
+                auto start_time = parse_datetime(start_str);
+                auto diff = std::chrono::duration_cast<std::chrono::minutes>(start_time - now).count();
+
+                if (diff == 60 || diff == 30 || diff == 5) {
+                    std::string message = "Задача \"" + name + "\" начнётся через " + std::to_string(diff) + " минут.";
+                    std::string command = "notify-send 'Напоминание' '" + message + "'";
+                    system(command.c_str());
+
+                    std::cout << "🔔 Уведомление отправлено: " << name << " (" << start_str << ")\n";
+                }
+            }
+
+            txn.commit();
+        } catch (const std::exception &e) {
+            std::cerr << "Ошибка в напоминалке: " << e.what() << std::endl;
+        }
+
+        std::this_thread::sleep_for(std::chrono::minutes(1));
     }
 }
 

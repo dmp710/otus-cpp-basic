@@ -5,6 +5,20 @@
 #include <unordered_map>
 #include <string>
 #include <sstream>
+#include <openssl/sha.h>
+
+inline std::string hashPassword(const std::string &password)
+{
+    unsigned char hash[SHA256_DIGEST_LENGTH];
+    SHA256(reinterpret_cast<const unsigned char *>(password.c_str()), password.size(), hash);
+
+    std::ostringstream ss;
+    for (unsigned char c : hash)
+    {
+        ss << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(c);
+    }
+    return ss.str();
+}
 
 // Проверка формата YYYY-MM-DD
 inline bool is_valid_date(const std::string &date)
@@ -69,4 +83,19 @@ inline std::unordered_map<std::string, std::string> readEnvFile(const std::strin
     }
 
     return env;
+}
+
+inline int isValidEmail(std::string &email)
+{
+    auto atPos = email.find("@");
+    auto dotPos = email.find(".");
+
+    return atPos != std::string::npos && dotPos != std::string::npos && atPos > 0 && dotPos > atPos + 1 && dotPos < email.size() - 1;
+}
+
+std::chrono::system_clock::time_point parse_datetime(const std::string &datetime) {
+    std::tm tm = {};
+    std::istringstream ss(datetime);
+    ss >> std::get_time(&tm, "%Y-%m-%d %H:%M:%S");
+    return std::chrono::system_clock::from_time_t(std::mktime(&tm));
 }

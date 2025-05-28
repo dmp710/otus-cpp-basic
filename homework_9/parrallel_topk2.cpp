@@ -5,19 +5,31 @@
 #include <iomanip>
 #include <iostream>
 #include <iterator>
-#include <unordered_map>
+#include <map>
 #include <vector>
 #include <chrono>
 #include <thread>
 #include <mutex>
+#include <queue>
+#include <iterator>
 
 const size_t TOPK = 10;
-using Counter = std::unordered_map<std::string, std::size_t>;
+using Counter = std::map<std::string, std::size_t>;
 
 std::string normalize(const std::string &str);
 void count_words(std::istream &stream, Counter &);
 void print_topk(std::ostream &stream, const Counter &, const size_t k);
-void merge_counters(Counter &target, const Counter &source);
+void merge_sorted_counters(const std::vector<Counter> &local_counters, Counter &final_counter);
+
+struct IteratorState {
+    Counter::const_iterator it;
+    Counter::const_iterator end;
+    size_t index;
+
+    bool operator>(const IteratorState &other) const {
+        return it->first > other.it->first;
+    }
+};
 
 int main(int argc, char *argv[])
 {
@@ -37,22 +49,22 @@ int main(int argc, char *argv[])
     {
         std::string filename = argv[i + 1];
         threads.emplace_back([filename, &local_counters, i]()
-                             {
+        {
             std::ifstream input{filename};
             if (!input.is_open())
             {
                 std::cerr << "Warning: Failed to open file " << filename << '\n';
                 return;
             }
-            count_words(input, local_counters[i]); });
+            count_words(input, local_counters[i]);
+        });
     }
 
     for (auto &t : threads)
         t.join();
 
     Counter global_counter;
-    for (const auto &local : local_counters)
-        merge_counters(global_counter, local);
+    merge_sorted_counters(local_counters, global_counter);
 
     print_topk(std::cout, global_counter, TOPK);
 
@@ -85,11 +97,32 @@ void count_words(std::istream &stream, Counter &counter)
     }
 }
 
-void merge_counters(Counter &target, const Counter &source)
-{
-    for (const auto &[word, count] : source)
-    {
-        target[word] += count;
+
+void merge_sorted_counters(const std::vector<Counter>& local_counters, Counter& final_counter) {
+    // Копируем итераторы на начало каждого Counter
+    std::priority_queue<IteratorState, std::vector<IteratorState>, std::greater<>> min_heap;
+    for (size_t i = 0; i < local_counters.size(); ++i) {
+        if (!local_counters[i].empty()) {
+            min_heap.push(IteratorState{local_counters[i].begin(), local_counters[i].end(), i});
+        }
+    }
+
+    while (!min_heap.empty()) {
+        auto current = min_heap.top();
+        min_heap.pop();
+
+        const auto &[key, count] = *current.it;
+
+        // Вставляем в конец, предполагая, что порядок ключей строго возрастающий
+        auto inserted = final_counter.insert({key, count});
+        if (!inserted.second) {
+            inserted.first->second += count;
+        }
+
+        ++current.it;
+        if (current.it != current.end) {
+            min_heap.push(current);
+        }
     }
 }
 
