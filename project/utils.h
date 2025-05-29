@@ -6,6 +6,7 @@
 #include <string>
 #include <sstream>
 #include <openssl/sha.h>
+#include <iomanip>  
 
 inline std::string hashPassword(const std::string &password)
 {
@@ -93,7 +94,7 @@ inline int isValidEmail(std::string &email)
     return atPos != std::string::npos && dotPos != std::string::npos && atPos > 0 && dotPos > atPos + 1 && dotPos < email.size() - 1;
 }
 
-std::chrono::system_clock::time_point parse_datetime(const std::string &datetime) {
+inline std::chrono::system_clock::time_point parse_datetime(const std::string &datetime) {
     std::tm tm = {};
     std::istringstream ss(datetime);
     ss >> std::get_time(&tm, "%Y-%m-%d %H:%M:%S");

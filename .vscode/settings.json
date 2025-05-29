@@ -72,6 +72,16 @@
         "semaphore": "cpp",
         "stop_token": "cpp",
         "thread": "cpp",
-        "typeindex": "cpp"
+        "typeindex": "cpp",
+        "coroutine": "cpp",
+        "source_location": "cpp",
+        "ranges": "cpp",
+        "shared_mutex": "cpp",
+        "valarray": "cpp",
+        "cfenv": "cpp",
+        "C_Cpp.default.cppStandard": "c++20",
+        "charconv": "cpp",
+        "pqxx": "cpp",
+        "result": "cpp"
     }
 }
