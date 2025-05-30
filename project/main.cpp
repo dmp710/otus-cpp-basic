@@ -4,6 +4,8 @@
 
 #include "WorkScheduler.h"
 #include "utils.h"
+#include "Database.h"
+#include "Postgres.h"
 
 void run();
 
@@ -42,7 +44,8 @@ void run()
                                    "dbname=" +
         env["POSTGRES_DB"];
 
-    WorkScheduler scheduler(connStr);
+    auto db = std::make_unique<Postgres> (connStr);
+    WorkScheduler scheduler(std::move(db));
 
     scheduler.start();
 }

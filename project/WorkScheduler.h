@@ -3,39 +3,24 @@
 #include <string>
 #include <pqxx/pqxx>
 
-struct Task
+#include "Database.h"
+
+class WorkScheduler
 {
-    std::string name;
-    std::string time_start;
-    std::string time_end;
-    std::string description;
-};
-
-
-class WorkScheduler {
 public:
-    explicit WorkScheduler(const std::string& connectionString);
-    ~WorkScheduler(); 
+    explicit WorkScheduler(std::unique_ptr<Database> db)
+        : db(std::move(db)) {};
 
     void start();
 
-    bool createUser(const std::string& email, const std::string& password);
-    bool login(const std::string& email, const std::string& password);
 private:
-    std::unique_ptr<pqxx::connection> conn_;
+    std::unique_ptr<Database> db;
 
-    int user_id = -1;
+    int user_id = 0;
     bool remind;
 
     void schedule();
 
-    std::vector<Task> get_tasks(const std::string &date_str);
-
-    bool add_task(const std::string &name,
-        const std::string &description,
-        const std::string &time_start,
-        const std::string &time_end);
-    
     void print_tasks_for_date(const std::string &date);
 
     void reminder_loop();

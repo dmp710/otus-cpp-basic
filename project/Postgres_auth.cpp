@@ -1,20 +1,19 @@
 #include <iostream>
+#include <pqxx/pqxx>
 
-#include "WorkScheduler.h"
+#include "Database.h"
+#include "Postgres.h"
 #include "utils.h"
 
-WorkScheduler::WorkScheduler(const std::string &connectionString)
-{
-    conn_ = std::make_unique<pqxx::connection>(connectionString);
-    if (!conn_->is_open())
-    {
-        throw std::runtime_error("Failed to connect to PostgreSQL database");
+Postgres::Postgres(const std::string& connString) {
+    conn_ = std::make_unique<pqxx::connection> (connString);
+    
+    if (!conn_ -> is_open()) {
+        throw std::runtime_error("");
     }
-}
+};
 
-WorkScheduler::~WorkScheduler() {}
-
-bool WorkScheduler::createUser(const std::string& email, const std::string& password) {
+bool Postgres::createUser(const std::string& email, const std::string& password) {
     if (!conn_ || !conn_->is_open()) {
         throw std::runtime_error("Database connection is not available");
     }
@@ -51,7 +50,7 @@ bool WorkScheduler::createUser(const std::string& email, const std::string& pass
 }
 
 
-bool WorkScheduler::login(const std::string& email, const std::string& password) {
+int Postgres::login(const std::string& email, const std::string& password) {
     if (!conn_ || !conn_->is_open()) {
         throw std::runtime_error("Database connection is not available");
     }
@@ -72,13 +71,12 @@ bool WorkScheduler::login(const std::string& email, const std::string& password)
         std::string storedHash = result[0]["hash"].as<std::string>();
 
         if (storedHash == hashPassword(password)) {
-            user_id = result[0]["user_id"].as<int>();
-            return true;
+            return result[0]["user_id"].as<int>();
         } else {
-            return false;
+            return 0;
         }
     } catch (const std::exception& e) {
         std::cerr << "Login error: " << e.what() << std::endl;
-        return false;
+        return 0;
     }
 }

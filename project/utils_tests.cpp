@@ -2,6 +2,7 @@
 #include <fstream>
 #include <cstdio> 
 #include "utils.h" 
+#include "utils_time.h" 
 
 TEST(UtilsTest, HashPassword_IsDeterministic) {
     std::string password = "secret";

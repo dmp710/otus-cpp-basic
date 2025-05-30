@@ -12,11 +12,15 @@ link_directories(/usr/local/lib)
 # === Основной исполняемый файл ===
 add_executable(work_scheduler  
     main.cpp
+    Database.h
+    Postgres.h
+    Postgres_auth.cpp
+    Postgres_tasks.cpp
     WorkScheduler.h
     WorkScheduler.cpp
     WorkScheduler_menu.cpp
-    WorkScheduler_auth.cpp
     utils.h
+    utils_time.h
 )
 
 target_link_libraries(work_scheduler

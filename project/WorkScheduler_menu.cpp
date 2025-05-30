@@ -4,6 +4,7 @@
 
 #include "WorkScheduler.h"
 #include "utils.h"
+#include "Database.h"
 
 void WorkScheduler::start()
 {
@@ -55,18 +56,21 @@ void WorkScheduler::start()
 
         if (choice == 1)
         {
-            if (login(email, password))
+            user_id = db -> login(email, password);
+
+            if (user_id)
             {
                 std::cout << "Welcome!" << std::endl;
                 schedule();
                 remind = false;
             }
+
             continue;
         }
 
         if (choice == 2)
         {
-            if (createUser(email, password))
+            if (db -> createUser(email, password))
             {
                 std::cout << "Success register!" << std::endl;
             }
