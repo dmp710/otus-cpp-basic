@@ -94,8 +94,7 @@ bool Postgres::add_task(const std::string &name,
             return false;
         }
 
-        txn.exec(pqxx::prepped("insert_task"), user_id, name, description, time_start, time_end);
-
+        txn.exec_prepared("insert_task", user_id, name, description, time_start, time_end);
         txn.commit();
 
         return true;

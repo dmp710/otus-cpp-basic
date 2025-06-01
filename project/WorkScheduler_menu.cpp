@@ -6,6 +6,15 @@
 #include "utils.h"
 #include "Database.h"
 
+void WorkScheduler::draw_enter_menu()
+{
+    std::cout << "Choose action" << std::endl;
+    std::cout << "1. Login" << std::endl;
+    std::cout << "2. Register" << std::endl;
+    std::cout << "3. Exit" << std::endl
+              << std::endl;
+}
+
 void WorkScheduler::start()
 {
     while (true)
@@ -14,10 +23,7 @@ void WorkScheduler::start()
         std::string email;
         std::string password;
 
-        std::cout << "Choose action" << std::endl;
-        std::cout << "1. Login" << std::endl;
-        std::cout << "2. Register" << std::endl;
-        std::cout << "3. Exit" << std::endl << std::endl;
+        draw_enter_menu();
 
         std::cin >> choice;
 
@@ -56,7 +62,7 @@ void WorkScheduler::start()
 
         if (choice == 1)
         {
-            user_id = db -> login(email, password);
+            user_id = db->login(email, password);
 
             if (user_id)
             {
@@ -70,7 +76,7 @@ void WorkScheduler::start()
 
         if (choice == 2)
         {
-            if (db -> createUser(email, password))
+            if (db->createUser(email, password))
             {
                 std::cout << "Success register!" << std::endl;
             }
@@ -78,4 +84,3 @@ void WorkScheduler::start()
         }
     }
 }
-

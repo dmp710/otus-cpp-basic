@@ -19,6 +19,9 @@ private:
     int user_id = 0;
     bool remind;
 
+    void draw_enter_menu();
+    void draw_action_menu();
+
     void schedule();
 
     void print_tasks_for_date(const std::string &date);

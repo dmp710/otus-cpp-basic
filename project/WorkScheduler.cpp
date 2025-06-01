@@ -8,6 +8,15 @@
 #include "utils.h"
 #include "utils_time.h"
 
+void WorkScheduler::draw_action_menu()
+{
+    std::cout << "\n=== Меню расписания ===" << std::endl;
+    std::cout << "1. Посмотреть расписание на сегодня" << std::endl;
+    std::cout << "2. Посмотреть расписание на определённую дату" << std::endl;
+    std::cout << "3. Добавить задачу" << std::endl;
+    std::cout << "4. Выход\n> ";
+}
+
 void WorkScheduler::schedule()
 {
     remind = true;
@@ -22,11 +31,7 @@ void WorkScheduler::schedule()
 
     while (true)
     {
-        std::cout << "\n=== Меню расписания ===" << std::endl;
-        std::cout << "1. Посмотреть расписание на сегодня" << std::endl;
-        std::cout << "2. Посмотреть расписание на определённую дату" << std::endl;
-        std::cout << "3. Добавить задачу" << std::endl;
-        std::cout << "4. Выход\n> ";
+        draw_action_menu();
 
         int choice;
         std::cin >> choice;
@@ -103,7 +108,7 @@ void WorkScheduler::schedule()
                 continue;
             }
 
-            if (db -> add_task(name, description, time_start, time_end, user_id))
+            if (db->add_task(name, description, time_start, time_end, user_id))
             {
                 std::cout << "Задача успешно добавлена.\n";
             }
@@ -122,7 +127,7 @@ void WorkScheduler::schedule()
 
 void WorkScheduler::print_tasks_for_date(const std::string &date)
 {
-    auto tasks = db -> get_tasks(date, user_id);
+    auto tasks = db->get_tasks(date, user_id);
 
     if (tasks.empty())
     {
@@ -154,7 +159,7 @@ void WorkScheduler::reminder_loop()
     {
         try
         {
-            auto tasks = db -> get_immediate_tasks(61, user_id);
+            auto tasks = db->get_immediate_tasks(61, user_id);
 
             for (const auto &task : tasks)
             {
