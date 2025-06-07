@@ -19,7 +19,7 @@ private:
     int user_id = 0;
     bool remind;
 
-    void draw_enter_menu();
+    int draw_enter_menu();
     void draw_action_menu();
 
     void schedule();

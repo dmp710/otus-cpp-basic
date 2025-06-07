@@ -9,6 +9,17 @@ find_package(OpenSSL REQUIRED)
 include_directories(/usr/local/include)
 link_directories(/usr/local/lib)
 
+# === FetchContent для FTXUI ===
+include(FetchContent)
+
+FetchContent_Declare(
+  ftxui
+  GIT_REPOSITORY https://github.com/ArthurSonzogni/FTXUI.git
+  GIT_TAG        v2.0.0  # или последняя стабильная версия
+)
+
+FetchContent_MakeAvailable(ftxui)
+
 # === Основной исполняемый файл ===
 add_executable(work_scheduler  
     main.cpp
@@ -27,10 +38,11 @@ target_link_libraries(work_scheduler
     pqxx
     pq
     OpenSSL::Crypto
+    ftxui::component
+    ftxui::dom
 )
 
 # === GoogleTest через FetchContent ===
-include(FetchContent)
 FetchContent_Declare(
   googletest
   GIT_REPOSITORY https://github.com/google/googletest.git

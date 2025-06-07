@@ -6,43 +6,76 @@
 #include "utils.h"
 #include "Database.h"
 
-void WorkScheduler::draw_enter_menu()
+
+#include <ftxui/component/component.hpp>  // Menu, Renderer
+#include <ftxui/component/screen_interactive.hpp>  // ScreenInteractive
+using namespace ftxui;
+
+int WorkScheduler::draw_enter_menu()
 {
-    std::cout << "Choose action" << std::endl;
-    std::cout << "1. Login" << std::endl;
-    std::cout << "2. Register" << std::endl;
-    std::cout << "3. Exit" << std::endl
-              << std::endl;
+    std::vector<std::string> options = {
+        "🔐 Login", 
+        "📝 Register", 
+        "❌ Exit"
+    };
+    int selected = 0;
+
+    auto menu = Menu(&options, &selected);
+
+    auto renderer = Renderer(menu, [&] {
+        return vbox({
+            text("Добро пожаловать в WorkScheduler!") 
+                | center 
+                | bold 
+                | color(Color::Green),
+
+            separator(),
+
+            text("Используйте стрелки ↑ ↓ и Enter для выбора") 
+                | center 
+                | dim,
+
+            menu->Render() 
+                | frame 
+                | borderRounded 
+                | center,
+
+        }) | center | vcenter;
+    });
+
+    auto screen = ScreenInteractive::TerminalOutput();
+
+    Component component = CatchEvent(renderer, [&](Event event) {
+        if (event == Event::Return) {
+            screen.ExitLoopClosure()();
+            return true;
+        }
+        return false;
+    });
+
+    screen.Loop(component);
+
+    return selected;
 }
+
+
 
 void WorkScheduler::start()
 {
     while (true)
     {
-        int choice;
         std::string email;
         std::string password;
 
-        draw_enter_menu();
+        int choice = draw_enter_menu();
 
-        std::cin >> choice;
-
-        // Проверка на ошибку ввода
-        if (std::cin.fail())
-        {
-            std::cin.clear();
-            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // Очистка буфера
-            std::cout << "Incorrect choice. A number was expected." << std::endl;
-            return;
-        }
-
-        if (choice == 3)
+        if (choice == 2)  // Exit
         {
             std::cout << "Bye" << std::endl;
             return;
         }
 
-        if (choice != 1 && choice != 2)
+        if (choice != 0 && choice != 1)
         {
             std::cout << "Input error." << std::endl;
             continue;
@@ -53,14 +86,14 @@ void WorkScheduler::start()
 
         if (!isValidEmail(email))
         {
-            std::cout << "invalid email, try again" << std::endl;
+            std::cout << "Invalid email, try again" << std::endl;
             continue;
         }
 
-        std::cout << "Enter_password" << std::endl;
+        std::cout << "Enter password" << std::endl;
         std::cin >> password;
 
-        if (choice == 1)
+        if (choice == 0)  // Login
         {
             user_id = db->login(email, password);
 
@@ -74,7 +107,7 @@ void WorkScheduler::start()
             continue;
         }
 
-        if (choice == 2)
+        if (choice == 1)  // Register
         {
             if (db->createUser(email, password))
             {
