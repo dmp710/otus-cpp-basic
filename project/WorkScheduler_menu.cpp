@@ -38,6 +38,7 @@ int WorkScheduler::draw_enter_menu()
             menu->Render() 
                 | frame 
                 | borderRounded 
+                | size(WIDTH, GREATER_THAN, 30) // минимальная ширина 40
                 | center,
 
         }) | center | vcenter;
@@ -57,8 +58,6 @@ int WorkScheduler::draw_enter_menu()
 
     return selected;
 }
-
-
 
 void WorkScheduler::start()
 {

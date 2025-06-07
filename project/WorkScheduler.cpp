@@ -136,9 +136,9 @@ void WorkScheduler::print_tasks_for_date(const std::string &date)
     else
     {
         std::cout << std::left
-                  << std::setw(20) << "Задача"
-                  << std::setw(25) << "Начало"
-                  << std::setw(25) << "Конец"
+                  << std::setw(30) << "Задача"
+                  << std::setw(30) << "Начало"
+                  << std::setw(30) << "Конец"
                   << "Описание\n";
         std::cout << std::string(90, '-') << "\n";
 
