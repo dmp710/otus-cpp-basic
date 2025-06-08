@@ -2,65 +2,89 @@
 
 #include "WorkScheduler.h"
 
-void WorkScheduler::draw_action_menu()
-{
-    std::cout << "\n=== Меню расписания ===" << std::endl;
-    std::cout << "1. Посмотреть расписание на сегодня" << std::endl;
-    std::cout << "2. Посмотреть расписание на определённую дату" << std::endl;
-    std::cout << "3. Добавить задачу" << std::endl;
-    std::cout << "4. Выход\n> ";
-}
-
 #include <ftxui/component/component.hpp>
 #include <ftxui/component/screen_interactive.hpp>
-#include <ftxui/dom/elements.hpp>
-
 using namespace ftxui;
 
-void WorkScheduler::print_tasks(const std::string& date) {
-    auto tasks = db->get_tasks(date, user_id);
+int WorkScheduler::draw_action_menu()
+{
+    std::vector<std::string> options = {
+        "📅 Посмотреть расписание на сегодня",
+        "📆 Посмотреть расписание на дату",
+        "➕ Добавить задачу",
+        "❌ Выход"};
+
+    int selected = 0;
+    int result = -1;
+
     auto screen = ScreenInteractive::TerminalOutput();
 
-    std::vector<Element> table_rows;
+    MenuOption option;
+    option.on_enter = [&]
+    {
+        result = selected;
+        screen.ExitLoopClosure()(); // <-- выход из меню по Enter
+    };
 
-    // Заголовок таблицы
-    table_rows.push_back(hbox({
-        text("Задача")     | bold | size(WIDTH, EQUAL, 25),
-        text("Начало")     | bold | size(WIDTH, EQUAL, 20),
-        text("Конец")      | bold | size(WIDTH, EQUAL, 20),
-        text("Описание")   | bold | size(WIDTH, EQUAL, 30)
-    }));
+    auto menu = Menu(&options, &selected, option);
 
-    // Строки задач
-    for (const auto& task : tasks) {
-        table_rows.push_back(hbox({
-            text(task.name)         | size(WIDTH, EQUAL, 25),
-            text(task.time_start)   | size(WIDTH, EQUAL, 20),
-            text(task.time_end)     | size(WIDTH, EQUAL, 20),
-            text(task.description)  | size(WIDTH, EQUAL, 30)
-        }));
-    }
-
-    if (tasks.empty()) {
-        table_rows.push_back(text("Нет задач на эту дату.") | dim | center);
-    }
-
-    // Кнопка выхода
-    auto exit_button = Button(" OK ", screen.ExitLoopClosure());
-
-    // Контейнер и рендер
-    auto layout = Container::Vertical({ exit_button });
-
-    auto renderer = Renderer(layout, [&] {
-        return vbox({
-            text("Задачи на дату: " + date) | center | bold | color(Color::Green),
-            separator(),
-            vbox(table_rows) | border | yframe | flex,
-            separator(),
-            hbox({ filler(), exit_button->Render(), filler() })
-        });
-    });
+    auto renderer = Renderer(menu, [&]
+                             { return vbox({
+                                          text("Меню расписания") | bold | center,
+                                          separator(),
+                                          menu->Render() | frame | border,
+                                      }) |
+                                      center | vcenter; });
 
     screen.Loop(renderer);
+
+    return result + 1; // 
 }
 
+int WorkScheduler::draw_enter_menu()
+{
+    std::vector<std::string> options = {
+        "🔐 Login", 
+        "📝 Register", 
+        "❌ Exit"
+    };
+    int selected = 0;
+
+    auto menu = Menu(&options, &selected);
+
+    auto renderer = Renderer(menu, [&] {
+        return vbox({
+            text("Добро пожаловать в WorkScheduler!") 
+                | center 
+                | bold 
+                | color(Color::Green),
+
+            separator(),
+
+            text("Используйте стрелки ↑ ↓ и Enter для выбора") 
+                | center 
+                | dim,
+
+            menu->Render() 
+                | frame 
+                | borderRounded 
+                | size(WIDTH, GREATER_THAN, 30) // минимальная ширина 40
+                | center,
+
+        }) | center | vcenter;
+    });
+
+    auto screen = ScreenInteractive::TerminalOutput();
+
+    Component component = CatchEvent(renderer, [&](Event event) {
+        if (event == Event::Return) {
+            screen.ExitLoopClosure()();
+            return true;
+        }
+        return false;
+    });
+
+    screen.Loop(component);
+
+    return selected;
+}

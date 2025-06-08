@@ -20,7 +20,7 @@ private:
     bool remind;
 
     int draw_enter_menu();
-    void draw_action_menu();
+    int draw_action_menu();
 
     void schedule();
 
