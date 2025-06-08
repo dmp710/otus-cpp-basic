@@ -1,21 +1,10 @@
 #include <iostream>
 #include <pqxx/pqxx>
 #include <thread>
-#include <regex>
 #include <chrono>
 
 #include "WorkScheduler.h"
-#include "utils.h"
 #include "utils_time.h"
-
-void WorkScheduler::draw_action_menu()
-{
-    std::cout << "\n=== Меню расписания ===" << std::endl;
-    std::cout << "1. Посмотреть расписание на сегодня" << std::endl;
-    std::cout << "2. Посмотреть расписание на определённую дату" << std::endl;
-    std::cout << "3. Добавить задачу" << std::endl;
-    std::cout << "4. Выход\n> ";
-}
 
 void WorkScheduler::schedule()
 {
@@ -53,7 +42,7 @@ void WorkScheduler::schedule()
             std::strftime(buf, sizeof(buf), "%Y-%m-%d", now_tm);
             std::string today(buf);
 
-            print_tasks_for_date(today);
+            print_tasks(today);
         }
         else if (choice == 2)
         {
@@ -67,7 +56,7 @@ void WorkScheduler::schedule()
                 continue;
             }
 
-            print_tasks_for_date(date);
+            print_tasks(date);
         }
         else if (choice == 3)
         {
@@ -125,33 +114,33 @@ void WorkScheduler::schedule()
     }
 }
 
-void WorkScheduler::print_tasks_for_date(const std::string &date)
-{
-    auto tasks = db->get_tasks(date, user_id);
+// void WorkScheduler::print_tasks_for_date(const std::string &date)
+// {
+//     auto tasks = db->get_tasks(date, user_id);
 
-    if (tasks.empty())
-    {
-        std::cout << "Нет задач на эту дату.\n";
-    }
-    else
-    {
-        std::cout << std::left
-                  << std::setw(30) << "Задача"
-                  << std::setw(30) << "Начало"
-                  << std::setw(30) << "Конец"
-                  << "Описание\n";
-        std::cout << std::string(90, '-') << "\n";
+//     if (tasks.empty())
+//     {
+//         std::cout << "Нет задач на эту дату.\n";
+//     }
+//     else
+//     {
+//         std::cout << std::left
+//                   << std::setw(30) << "Задача"
+//                   << std::setw(30) << "Начало"
+//                   << std::setw(30) << "Конец"
+//                   << "Описание\n";
+//         std::cout << std::string(90, '-') << "\n";
 
-        for (const auto &task : tasks)
-        {
-            std::cout << std::left
-                      << std::setw(20) << task.name
-                      << std::setw(25) << task.time_start
-                      << std::setw(25) << task.time_end
-                      << task.description << "\n";
-        }
-    }
-}
+//         for (const auto &task : tasks)
+//         {
+//             std::cout << std::left
+//                       << std::setw(20) << task.name
+//                       << std::setw(25) << task.time_start
+//                       << std::setw(25) << task.time_end
+//                       << task.description << "\n";
+//         }
+//     }
+// }
 
 void WorkScheduler::reminder_loop()
 {

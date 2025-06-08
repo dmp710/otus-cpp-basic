@@ -30,6 +30,7 @@ add_executable(work_scheduler
     WorkScheduler.h
     WorkScheduler.cpp
     WorkScheduler_menu.cpp
+    WorkScheduler_draw.cpp
     utils.h
     utils_time.h
 )

@@ -24,7 +24,7 @@ private:
 
     void schedule();
 
-    void print_tasks_for_date(const std::string &date);
+    void print_tasks(const std::string &date);
 
     void reminder_loop();
 };
