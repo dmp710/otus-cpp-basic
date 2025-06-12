@@ -7,9 +7,6 @@
 #include "utils_time.h"
 
 void WorkScheduler::schedule() {
-    remind = true;
-    std::thread t(reminder_loop);
-
     while (true) {
         int choice = draw_action_menu();
 
@@ -70,9 +67,6 @@ void WorkScheduler::schedule() {
             std::cout << "Выход из расписания.\n";
             break;
         }
-
-        remind = false;
-        t.join();
     }
 }
 
@@ -123,43 +117,4 @@ void WorkScheduler::print_tasks(const std::string &date)
                                             hbox({filler(), exit_button->Render(), filler()})}); });
 
     screen.Loop(renderer);
-}
-
-
-void WorkScheduler::reminder_loop()
-{
-    while (true)
-    {
-        try
-        {
-            auto tasks = db->get_immediate_tasks(61, user_id);
-
-            for (const auto &task : tasks)
-            {
-                std::string name = task.name;
-                std::string start_str = task.time_start;
-
-                // преобразование с учётом часовых поясов
-                auto start_time = parse_datetime(start_str);
-
-                auto now = std::chrono::system_clock::now();
-                auto diff = std::chrono::duration_cast<std::chrono::minutes>(start_time - now).count();
-
-                if (diff == 60 || diff == 30 || diff == 5)
-                {
-                    std::string message = "Задача \"" + name + "\" начнётся через " + std::to_string(diff) + " минут.";
-                    std::string command = "notify-send 'Напоминание' '" + message + "'";
-                    system(command.c_str());
-
-                    std::cout << "🔔 Уведомление отправлено: " << name << " (" << start_str << ")\n";
-                }
-            }
-        }
-        catch (const std::exception &e)
-        {
-            std::cerr << "Ошибка в напоминалке: " << e.what() << std::endl;
-        }
-
-        std::this_thread::sleep_for(std::chrono::minutes(1));
-    }
 }

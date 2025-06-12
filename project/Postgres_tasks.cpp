@@ -56,7 +56,7 @@ std::vector<Task> Postgres::get_immediate_tasks(int t, const int &user_id)
 
         pqxx::result result = txn.exec_prepared("get_immediate_tasks", user_id, now_buf, in_buf);
 
-        std::transform(result.begin(), result.end(), std::back_inserter(result),
+        std::transform(result.begin(), result.end(), std::back_inserter(tasks),
                        [](const auto &row)
                        {
                            return Task{
