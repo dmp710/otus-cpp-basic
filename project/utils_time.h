@@ -7,8 +7,11 @@
 inline std::chrono::system_clock::time_point parse_datetime(const std::string &datetime) {
     std::tm tm = {};
     std::istringstream ss(datetime);
-    ss >> std::get_time(&tm, "%Y-%m-%d %H:%M");
     
+    ss.imbue(std::locale::classic()); // на всякий случай
+    ss >> std::get_time(&tm, "%Y-%m-%d %H:%M:%S");
+    tm.tm_isdst = -1; // учитывать летнее время корректно
+
     return std::chrono::system_clock::from_time_t(std::mktime(&tm));
 }
 

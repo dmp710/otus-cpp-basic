@@ -7,7 +7,6 @@
 #include "Database.h"
 #include "utils_time.h"
 
-
 #include <ftxui/component/component.hpp>  // Menu, Renderer
 #include <ftxui/component/screen_interactive.hpp>  // ScreenInteractive
 using namespace ftxui;
@@ -85,7 +84,7 @@ void WorkScheduler::reminder_loop()
 
         try
         {   
-            auto tasks = db->get_immediate_tasks(61, user_id);
+            auto tasks = db-> get_immediate_tasks(61, user_id);
 
             for (const auto &task : tasks)
             {
