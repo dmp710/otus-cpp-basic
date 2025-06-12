@@ -1,5 +1,6 @@
 #include <vector>
 #include <iostream>
+#include <algorithm>
 
 #include "Database.h"
 #include "Postgres.h"
@@ -15,14 +16,15 @@ std::vector<Task> Postgres::get_tasks(const std::string &date_str, const int &us
 
         pqxx::result result = txn.exec_prepared("get_tasks_for_day", user_id, date_str);
 
-        for (const auto &row : result)
-        {
-            tasks.push_back(Task{
-                row["task_name"].c_str(),
-                row["time_start"].c_str(),
-                row["time_end"].c_str(),
-                row["description"].is_null() ? "" : row["description"].c_str()});
-        }
+        std::transform(result.begin(), result.end(), std::back_inserter(tasks),
+                       [](const auto &row)
+                       {
+                           return Task{
+                               row["task_name"].c_str(),
+                               row["time_start"].c_str(),
+                               row["time_end"].c_str(),
+                               row["description"].is_null() ? "" : row["description"].c_str()};
+                       });
 
         txn.commit();
     }
@@ -54,15 +56,15 @@ std::vector<Task> Postgres::get_immediate_tasks(int t, const int &user_id)
 
         pqxx::result result = txn.exec_prepared("get_immediate_tasks", user_id, now_buf, in_buf);
 
-        for (const auto &row : result)
-        {
-            tasks.push_back(Task{
-                row["task_name"].c_str(),
-                row["time_start"].c_str(),
-                row["time_end"].c_str(),
-                row["description"].is_null() ? "" : row["description"].c_str()});
-        }
-
+        std::transform(result.begin(), result.end(), std::back_inserter(result),
+                       [](const auto &row)
+                       {
+                           return Task{
+                               row["task_name"].c_str(),
+                               row["time_start"].c_str(),
+                               row["time_end"].c_str(),
+                               row["description"].is_null() ? "" : row["description"].c_str()};
+                       });
         txn.commit();
     }
     catch (const std::exception &e)

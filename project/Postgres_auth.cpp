@@ -5,10 +5,10 @@
 #include "Postgres.h"
 #include "utils.h"
 
-Postgres::Postgres(const std::string& connString) {
-    conn_ = std::make_unique<pqxx::connection>(connString);
-
-    if (!conn_ || !conn_->is_open()) {
+Postgres::Postgres(const std::string& connString): 
+    conn_(std::make_unique<pqxx::connection>(connString)) {
+    if (!conn_ || !conn_->is_open())
+    {
         throw std::runtime_error("Failed to open database connection");
     }
 
@@ -44,18 +44,21 @@ Postgres::Postgres(const std::string& connString) {
 }
 
 bool Postgres::createUser(const std::string& email, const std::string& password) {
-    if (!conn_ || !conn_->is_open()) {
+    if (!conn_ || !conn_->is_open())
+    {
         throw std::runtime_error("Database connection is not available");
     }
 
     std::string passwordHash = hashPassword(password);
 
-    try {
+    try
+    {
         pqxx::work txn(*conn_);
 
         pqxx::result result = txn.exec_prepared("check_user_exists", email);
 
-        if (!result.empty()) {
+        if (!result.empty())
+        {
             std::cerr << "User already exists: " << email << std::endl;
             return false;
         }
@@ -64,38 +67,50 @@ bool Postgres::createUser(const std::string& email, const std::string& password)
 
         txn.commit();
         return true;
-    } catch (const pqxx::sql_error& e) {
+    }
+    catch (const pqxx::sql_error &e)
+    {
         std::cerr << "SQL error: " << e.what() << "\nQuery: " << e.query() << std::endl;
         return false;
-    } catch (const std::exception& e) {
+    }
+    catch (const std::exception &e)
+    {
         std::cerr << "Error creating user: " << e.what() << std::endl;
         return false;
     }
 }
 
 int Postgres::login(const std::string& email, const std::string& password) {
-    if (!conn_ || !conn_->is_open()) {
+    if (!conn_ || !conn_->is_open())
+    {
         throw std::runtime_error("Database connection is not available");
     }
 
-    try {
+    try
+    {
         pqxx::work txn(*conn_);
 
         pqxx::result result = txn.exec_prepared("get_user_credentials", email);
 
-        if (result.empty()) {
+        if (result.empty())
+        {
             std::cerr << "User not found: " << email << std::endl;
             return 0;
         }
 
         std::string storedHash = result[0]["hash"].as<std::string>();
 
-        if (storedHash == hashPassword(password)) {
+        if (storedHash == hashPassword(password))
+        {
             return result[0]["user_id"].as<int>();
-        } else {
+        }
+        else
+        {
             return 0;
         }
-    } catch (const std::exception& e) {
+    }
+    catch (const std::exception &e)
+    {
         std::cerr << "Login error: " << e.what() << std::endl;
         return 0;
     }

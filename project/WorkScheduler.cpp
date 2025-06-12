@@ -7,6 +7,9 @@
 #include "utils_time.h"
 
 void WorkScheduler::schedule() {
+    remind = true;
+    std::thread t(reminder_loop);
+
     while (true) {
         int choice = draw_action_menu();
 
@@ -67,6 +70,9 @@ void WorkScheduler::schedule() {
             std::cout << "Выход из расписания.\n";
             break;
         }
+
+        remind = false;
+        t.join();
     }
 }
 

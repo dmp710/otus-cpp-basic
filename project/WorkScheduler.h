@@ -17,7 +17,7 @@ private:
     std::unique_ptr<Database> db;
 
     int user_id = 0;
-    bool remind;
+    bool remind = false;
 
     int draw_enter_menu();
     int draw_action_menu();

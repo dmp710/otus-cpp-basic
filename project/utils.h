@@ -45,7 +45,7 @@ inline std::unordered_map<std::string, std::string> readEnvFile(const std::strin
     return env;
 }
 
-inline int isValidEmail(std::string &email)
+inline int isValidEmail(const std::string &email)
 {
     auto atPos = email.find("@");
     auto dotPos = email.find(".");
